@@ -7,7 +7,7 @@ import (
 )
 
 type CreateRestaurantStore interface {
-	CreateRestaurant(context context.Context, data *restaurantmodel.RestaurantCreate) error
+	Create(context context.Context, data *restaurantmodel.RestaurantCreate) error
 }
 
 type createRestaurantBiz struct {
@@ -23,7 +23,7 @@ func (biz *createRestaurantBiz) CreateRestaurant(context context.Context, data *
 		return errors.New("name cannot be empty")
 	}
 
-	if err := biz.store.CreateRestaurant(context, data); err != nil {
+	if err := biz.store.Create(context, data); err != nil {
 		return err
 	}
 	return nil

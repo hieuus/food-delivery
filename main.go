@@ -186,28 +186,7 @@ func main() {
 	})
 
 	//5 Delete
-	restaurants.DELETE("/:id", func(context *gin.Context) {
-		id, err := strconv.Atoi(context.Param("id"))
-
-		if err != nil {
-			context.JSON(http.StatusBadRequest, gin.H{
-				"error": err,
-			})
-			return
-		}
-
-		if err := db.Table(Restaurant{}.TableName()).Where("id = ?", id).Delete(nil).Error; err != nil {
-			context.JSON(http.StatusBadRequest, gin.H{
-				"error": err,
-			})
-			return
-		}
-
-		context.JSON(http.StatusOK, gin.H{
-			"message": "deleted",
-		})
-
-	})
+	restaurants.DELETE("/:id", ginrestaurant.DeleteRestaurant(db))
 
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
