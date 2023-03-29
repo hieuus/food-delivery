@@ -117,45 +117,8 @@ func main() {
 		})
 	})
 
-	//3. Get all and paging
-	restaurants.GET("", func(context *gin.Context) {
-		type Paging struct {
-			Page  int `json:"page" form:"page"`
-			Limit int `json:"limit" form:"limit"`
-		}
-
-		var pagingData Paging
-
-		var data []Restaurant
-
-		if err := context.ShouldBind(&pagingData); err != nil {
-			context.JSON(http.StatusBadRequest, gin.H{
-				"error": err,
-			})
-			return
-		}
-
-		if pagingData.Page <= 0 {
-			pagingData.Page = 1
-		}
-
-		if pagingData.Limit <= 0 {
-			pagingData.Limit = 5
-		}
-
-		if err := db.Order("id desc").
-			Offset((pagingData.Page - 1) * pagingData.Limit).
-			Limit(pagingData.Limit).
-			Find(&data).Error; err != nil {
-			context.JSON(http.StatusBadRequest, gin.H{
-				"error": err,
-			})
-		}
-
-		context.JSON(http.StatusOK, gin.H{
-			"data": data,
-		})
-	})
+	//3. Get list restaurant with paging
+	restaurants.GET("", ginrestaurant.ListRestaurant(appCtx))
 
 	//4. Update
 	restaurants.PATCH("/:id", func(context *gin.Context) {
