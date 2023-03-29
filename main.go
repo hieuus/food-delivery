@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/hieuus/food-delivery/component/appctx"
 	"github.com/hieuus/food-delivery/module/restaurant/transport/ginrestaurant"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -35,7 +36,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	log.Println(db)
+	db = db.Debug()
 
 	//Simple CRUD
 	//1. Create
@@ -83,11 +84,13 @@ func main() {
 		})
 	})
 
+	appCtx := appctx.NewAppContext(db)
+
 	v1 := r.Group("/v1")
 	restaurants := v1.Group("/restaurants")
 
 	//1. Create new restaurant
-	restaurants.POST("/", ginrestaurant.CreateRestaurant(db))
+	restaurants.POST("/", ginrestaurant.CreateRestaurant(appCtx))
 
 	//2. GET By Id
 	restaurants.GET("/:id", func(context *gin.Context) {
@@ -186,7 +189,7 @@ func main() {
 	})
 
 	//5 Delete
-	restaurants.DELETE("/:id", ginrestaurant.DeleteRestaurant(db))
+	restaurants.DELETE("/:id", ginrestaurant.DeleteRestaurant(appCtx))
 
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
