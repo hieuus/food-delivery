@@ -63,7 +63,8 @@ func (e *AppError) Error() string {
 }
 
 func ErrDB(err error) *AppError {
-	return NewErrorResponse(err, "something went wrong with DB", err.Error(), "DB_ERROR")
+	return NewFullErrorResponse(http.StatusInternalServerError, err, "something went wrong with DB", err.Error(), "DB_ERROR")
+
 }
 
 func ErrInvalidRequest(err error) *AppError {
@@ -111,5 +112,13 @@ func ErrCannotCreateEntity(entity string, err error) *AppError {
 		err,
 		fmt.Sprintf("Cannot create %s", strings.ToLower(entity)),
 		fmt.Sprintf("ErrCannotCreate%s", entity),
+	)
+}
+
+func ErrNoPermission(err error) *AppError {
+	return NewCustomError(
+		err,
+		fmt.Sprintf("You have no permission"),
+		fmt.Sprintf("ErrNoPermission"),
 	)
 }
