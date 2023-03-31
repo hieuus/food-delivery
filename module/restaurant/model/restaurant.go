@@ -1,11 +1,16 @@
 package restaurantmodel
 
-import "github.com/hieuus/food-delivery/common"
+import (
+	"errors"
+	"github.com/hieuus/food-delivery/common"
+	"strings"
+)
 
 type Restaurant struct {
 	common.SQLModel `json:",inline"`
 	Name            string `json:"name" gorm:"column:name;"`
 	Addr            string `json:"addr" gorm:"column:addr;"`
+	Type            string `json:"type" gorm:"column:type;"`
 }
 
 func (Restaurant) TableName() string { return "restaurants" }
@@ -16,6 +21,16 @@ type RestaurantCreate struct {
 	Addr            string `json:"addr" gorm:"column:addr;"`
 }
 
+func (data *RestaurantCreate) Validate() error {
+	data.Name = strings.TrimSpace(data.Name)
+
+	if data.Name == "" {
+		return ErrNameISEmpty
+	}
+
+	return nil
+}
+
 func (RestaurantCreate) TableName() string { return Restaurant{}.TableName() }
 
 type RestaurantUpdate struct {
@@ -24,3 +39,7 @@ type RestaurantUpdate struct {
 }
 
 func (RestaurantUpdate) TableName() string { return Restaurant{}.TableName() }
+
+var (
+	ErrNameISEmpty = errors.New("name cannot be empty")
+)

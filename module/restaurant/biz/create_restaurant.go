@@ -2,7 +2,6 @@ package restaurantbiz
 
 import (
 	"context"
-	"errors"
 	restaurantmodel "github.com/hieuus/food-delivery/module/restaurant/model"
 )
 
@@ -19,8 +18,9 @@ func NewCreateRestaurantBiz(store CreateRestaurantStore) *createRestaurantBiz {
 }
 
 func (biz *createRestaurantBiz) CreateRestaurant(context context.Context, data *restaurantmodel.RestaurantCreate) error {
-	if data.Name == "" {
-		return errors.New("name cannot be empty")
+
+	if err := data.Validate(); err != nil {
+		return err
 	}
 
 	if err := biz.store.Create(context, data); err != nil {
