@@ -2,6 +2,7 @@ package restaurantbiz
 
 import (
 	"context"
+	"errors"
 	"github.com/hieuus/food-delivery/common"
 	restaurantmodel "github.com/hieuus/food-delivery/module/restaurant/model"
 )
@@ -29,3 +30,5 @@ func (biz *createRestaurantBiz) CreateRestaurant(context context.Context, data *
 	}
 	return nil
 }
+
+var ErrRecordNotFound = errors.New("record not found")

@@ -17,20 +17,14 @@ func DeleteRestaurant(appCtx appctx.AppContext) gin.HandlerFunc {
 		id, err := strconv.Atoi(context.Param("id"))
 
 		if err != nil {
-			context.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
+			panic(common.ErrInvalidRequest(err))
 		}
 
 		store := restaurantstorage.NewSqlStore(db)
 		biz := restaurantbiz.NewDeleteRestaurantBiz(store)
 
 		if err := biz.DeleteRestaurant(context.Request.Context(), id); err != nil {
-			context.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
+			panic(err)
 		}
 
 		context.JSON(http.StatusOK, common.SimpleSuccessResponse(true))

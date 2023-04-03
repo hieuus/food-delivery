@@ -122,3 +122,21 @@ func ErrNoPermission(err error) *AppError {
 		fmt.Sprintf("ErrNoPermission"),
 	)
 }
+
+func ErrEntityDeleted(entity string, err error) *AppError {
+	return NewCustomError(
+		err,
+		fmt.Sprintf("%s deleted", strings.ToLower(entity)),
+		fmt.Sprintf("Err%sDeleted", entity),
+	)
+}
+
+func ErrEntityNotFound(entity string, err error) *AppError {
+	return NewCustomError(
+		err,
+		fmt.Sprintf("%s not found", strings.ToLower(entity)),
+		fmt.Sprintf("Err%sNotFound", entity),
+	)
+}
+
+var ErrRecordNotFound = errors.New("record not found")
