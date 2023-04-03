@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/hieuus/food-delivery/component/appctx"
+	"github.com/hieuus/food-delivery/middleware"
 	"github.com/hieuus/food-delivery/module/restaurant/transport/ginrestaurant"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -38,53 +39,11 @@ func main() {
 
 	db = db.Debug()
 
-	//Simple CRUD
-	//1. Create
-	/*
-		newRestaurant := Restaurant{Name: "Tani", Addr: "09 Pham Van hai"}
-
-		if err := db.Create(&newRestaurant).Error; err != nil {
-			log.Println(err)
-		}
-	*/
-
-	//2. Read -> Where
-	/*
-		var myRestaurant Restaurant
-
-		if err := db.Where("id = ?", 1).Find(&myRestaurant).Error; err != nil {
-			log.Println(err)
-		}
-
-			log.Println(myRestaurant)
-	*/
-
-	//3. Update
-	/*
-		myRestaurant.Name = "Remove TaniPlus"
-		if err := db.Where("id = ?", 3).Updates(&myRestaurant).Error; err != nil {
-			log.Println(err)
-		}
-
-		log.Println(myRestaurant)
-	*/
-
-	//4. Delete
-	/*
-		if err := db.Table(Restaurant{}.TableName()).Where("id = ?", 3).Delete(nil).Error; err != nil {
-				log.Println(err)
-			}
-	*/
+	appCtx := appctx.NewAppContext(db)
 
 	//REST API
 	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
-
-	appCtx := appctx.NewAppContext(db)
+	r.Use(middleware.Recover(appCtx))
 
 	v1 := r.Group("/v1")
 	restaurants := v1.Group("/restaurants")
