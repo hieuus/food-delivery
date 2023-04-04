@@ -7,14 +7,15 @@ import (
 	restaurantbiz "github.com/hieuus/food-delivery/module/restaurant/biz"
 	restaurantstorage "github.com/hieuus/food-delivery/module/restaurant/storage"
 	"net/http"
-	"strconv"
 )
 
 func DeleteRestaurant(appCtx appctx.AppContext) gin.HandlerFunc {
 	return func(context *gin.Context) {
 		db := appCtx.GetMainDBConnection()
 
-		id, err := strconv.Atoi(context.Param("id"))
+		//id, err := strconv.Atoi(context.Param("id"))
+
+		uid, err := common.FromBase58(context.Param("id"))
 
 		if err != nil {
 			panic(common.ErrInvalidRequest(err))
@@ -23,7 +24,7 @@ func DeleteRestaurant(appCtx appctx.AppContext) gin.HandlerFunc {
 		store := restaurantstorage.NewSqlStore(db)
 		biz := restaurantbiz.NewDeleteRestaurantBiz(store)
 
-		if err := biz.DeleteRestaurant(context.Request.Context(), id); err != nil {
+		if err := biz.DeleteRestaurant(context.Request.Context(), int(uid.GetLocalID())); err != nil {
 			panic(err)
 		}
 
