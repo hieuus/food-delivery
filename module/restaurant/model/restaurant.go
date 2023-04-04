@@ -17,9 +17,10 @@ const (
 
 type Restaurant struct {
 	common.SQLModel `json:",inline"`
-	Name            string `json:"name" gorm:"column:name;"`
-	Addr            string `json:"addr" gorm:"column:addr;"`
-	Type            string `json:"type" gorm:"column:type;"`
+	Name            string        `json:"name" gorm:"column:name;"`
+	Addr            string        `json:"addr" gorm:"column:addr;"`
+	Type            string        `json:"type" gorm:"column:type;"`
+	Logo            *common.Image `json:"logo" gorm:"column:logo;"`
 }
 
 func (Restaurant) TableName() string { return "restaurants" }
@@ -30,8 +31,9 @@ func (r *Restaurant) Mask(isAdminOrOwner bool) {
 
 type RestaurantCreate struct {
 	common.SQLModel `json:",inline"`
-	Name            string `json:"name" gorm:"column:name;"`
-	Addr            string `json:"addr" gorm:"column:addr;"`
+	Name            string        `json:"name" gorm:"column:name;"`
+	Addr            string        `json:"addr" gorm:"column:addr;"`
+	Logo            *common.Image `json:"logo" gorm:"column:logo;"`
 }
 
 func (data *RestaurantCreate) Mask(isAdminOrOwner bool) {
@@ -51,8 +53,9 @@ func (data *RestaurantCreate) Validate() error {
 func (RestaurantCreate) TableName() string { return Restaurant{}.TableName() }
 
 type RestaurantUpdate struct {
-	Name *string `json:"name" gorm:"column:name;"`
-	Addr *string `json:"addr" gorm:"column:addr;"`
+	Name *string       `json:"name" gorm:"column:name;"`
+	Addr *string       `json:"addr" gorm:"column:addr;"`
+	Logo *common.Image `json:"logo" gorm:"column:logo;"`
 }
 
 func (RestaurantUpdate) TableName() string { return Restaurant{}.TableName() }
