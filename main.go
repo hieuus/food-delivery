@@ -3,8 +3,10 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/hieuus/food-delivery/component/appctx"
+	"github.com/hieuus/food-delivery/component/uploadprovider"
 	"github.com/hieuus/food-delivery/middleware"
 	"github.com/hieuus/food-delivery/module/restaurant/transport/ginrestaurant"
+	"github.com/hieuus/food-delivery/module/upload/uploadtransport/ginupload"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
@@ -31,6 +33,14 @@ func (RestaurantUpdate) TableName() string { return Restaurant{}.TableName() }
 func main() {
 	//Connect to DB
 	dsn := os.Getenv("MYSQL_CONN_STRING")
+
+	//aws s3
+	s3BucketName := os.Getenv("S3BucketName")
+	s3Region := os.Getenv("S3Region")
+	s3APIKey := os.Getenv("S3APIKey")
+	s3SecretKey := os.Getenv("S3SecretKey")
+	s3Domain := os.Getenv("S3Domain")
+
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
@@ -39,13 +49,18 @@ func main() {
 
 	db = db.Debug()
 
-	appCtx := appctx.NewAppContext(db)
+	s3Provider := uploadprovider.NewS3Provider(s3BucketName, s3Region, s3APIKey, s3SecretKey, s3Domain)
+
+	appCtx := appctx.NewAppContext(db, s3Provider)
 
 	//REST API
 	r := gin.Default()
 	r.Use(middleware.Recover(appCtx))
 
 	v1 := r.Group("/v1")
+
+	v1.POST("/upload", ginupload.Upload(appCtx))
+
 	restaurants := v1.Group("/restaurants")
 
 	//1. Create new restaurant
