@@ -26,18 +26,18 @@ func NewUploadBiz(provider uploadprovider.UploadProvider) *uploadBiz {
 func (biz *uploadBiz) Upload(ctx context.Context, data []byte, folder, filename string) (*common.Image, error) {
 	fileBytes := bytes.NewBuffer(data)
 
-	w, h, err := getImageDemension(fileBytes)
+	w, h, _ := getImageDimension(fileBytes)
 
-	if err != nil {
-		return nil, uploadmodel.ErrFileIsNotImage(err)
-	}
+	//if err != nil {
+	//	return nil, uploadmodel.ErrFileIsNotImage(err)
+	//}
 
 	if strings.TrimSpace(folder) == "" {
 		folder = "img"
 	}
 
 	fileExt := filepath.Ext(filename)
-	filename = fmt.Sprint("%d%s", time.Now().Nanosecond(), fileExt)
+	filename = fmt.Sprintf("%d%s", time.Now().Nanosecond(), fileExt)
 
 	img, err := biz.provider.SaveFileUploaded(ctx, data, fmt.Sprintf("%s/%s", folder, filename))
 
@@ -51,8 +51,8 @@ func (biz *uploadBiz) Upload(ctx context.Context, data []byte, folder, filename 
 	return img, nil
 }
 
-func getImageDemension(reader io.Reader) (int, int, error) {
-	img, _, err := image.DecodeConfig((reader))
+func getImageDimension(reader io.Reader) (int, int, error) {
+	img, _, err := image.DecodeConfig(reader)
 
 	if err != nil {
 		log.Println("error", err)

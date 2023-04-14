@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func Upload(appCtx appctx.AppContext) func(ctx *gin.Context) {
+func Upload(appCtx appctx.AppContext) func(*gin.Context) {
 	return func(c *gin.Context) {
 		fileHeader, err := c.FormFile("file")
 
@@ -17,6 +17,7 @@ func Upload(appCtx appctx.AppContext) func(ctx *gin.Context) {
 		}
 
 		folder := c.DefaultPostForm("folder", "img")
+
 		file, err := fileHeader.Open()
 
 		if err != nil {
