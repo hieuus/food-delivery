@@ -7,6 +7,7 @@ import (
 	"github.com/hieuus/food-delivery/middleware"
 	"github.com/hieuus/food-delivery/module/restaurant/transport/ginrestaurant"
 	"github.com/hieuus/food-delivery/module/upload/uploadtransport/ginupload"
+	"github.com/hieuus/food-delivery/module/user/transport/ginuser"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
@@ -60,6 +61,8 @@ func main() {
 	v1 := r.Group("/v1")
 
 	v1.POST("/upload", ginupload.Upload(appCtx))
+
+	v1.POST("/register", ginuser.Register(appCtx))
 
 	restaurants := v1.Group("/restaurants")
 

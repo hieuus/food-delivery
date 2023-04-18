@@ -1,8 +1,11 @@
 package usermodel
 
-import "github.com/hieuus/food-delivery/common"
+import (
+	"errors"
+	"github.com/hieuus/food-delivery/common"
+)
 
-const entityName = "User"
+const EntityName = "User"
 
 type User struct {
 	common.SQLModel `json:",inline"`
@@ -59,3 +62,11 @@ type UserLogin struct {
 func (UserLogin) TableName() string {
 	return User{}.TableName()
 }
+
+var (
+	ErrEmailExisted = common.NewCustomError(
+		errors.New("email existed"),
+		"email existed",
+		"ErrEmailExisted",
+	)
+)
