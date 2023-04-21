@@ -40,7 +40,7 @@ func (u *User) Mask(isAdmin bool) {
 type UserCreate struct {
 	common.SQLModel `json:",inline"`
 	Email           string        `json:"email" gorm:"column:email;"`
-	Password        string        `json:"-" gorm:"column:password;"`
+	Password        string        `json:"password" gorm:"column:password;"`
 	Salt            string        `json:"-" gorm:"column:salt;"`
 	LastName        string        `json:"last_name" gorm:"column:last_name;"`
 	FirstName       string        `json:"first_name" gorm:"column:first_name;"`
@@ -55,15 +55,19 @@ func (u *UserCreate) Mask(isAdmin bool) {
 }
 
 type UserLogin struct {
-	Email    string `json:"'email" form:"email" gorm:"column:email;"`
-	Password string `json:"password" form:"email" gorm:"column:password;"`
+	Email    string `json:"email" form:"email" gorm:"column:email;"`
+	Password string `json:"password" form:"password" gorm:"column:password;"`
 }
 
-func (UserLogin) TableName() string {
-	return User{}.TableName()
-}
+func (UserLogin) TableName() string { return User{}.TableName() }
 
 var (
+	ErrEmailOrPasswordInvalid = common.NewCustomError(
+		errors.New("email or password invalid"),
+		"email or password invalid",
+		"ErrEmailOrPasswordInvalid",
+	)
+
 	ErrEmailExisted = common.NewCustomError(
 		errors.New("email existed"),
 		"email existed",

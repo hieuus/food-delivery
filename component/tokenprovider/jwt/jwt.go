@@ -61,3 +61,7 @@ func (j *jwtProvider) Validate(myToken string) (*tokenprovider.TokenPayload, err
 
 	return &claims.Payload, nil
 }
+
+func (j *jwtProvider) String() string {
+	return "JWT implement provider"
+}
