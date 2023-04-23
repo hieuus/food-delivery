@@ -5,15 +5,10 @@ import (
 	"github.com/hieuus/food-delivery/component/appctx"
 	"github.com/hieuus/food-delivery/component/uploadprovider"
 	"github.com/hieuus/food-delivery/middleware"
-	"github.com/hieuus/food-delivery/module/restaurant/transport/ginrestaurant"
-	"github.com/hieuus/food-delivery/module/upload/uploadtransport/ginupload"
-	"github.com/hieuus/food-delivery/module/user/transport/ginuser"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
-	"net/http"
 	"os"
-	"strconv"
 )
 
 type Restaurant struct {
@@ -42,6 +37,7 @@ func main() {
 	s3SecretKey := os.Getenv("S3SecretKey")
 	s3Domain := os.Getenv("S3Domain")
 
+	//authorization
 	secretKey := os.Getenv("SYSTEM_SECRET")
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
@@ -49,7 +45,7 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
+	//see queries call in DB
 	db = db.Debug()
 
 	s3Provider := uploadprovider.NewS3Provider(s3BucketName, s3Region, s3APIKey, s3SecretKey, s3Domain)
@@ -62,78 +58,8 @@ func main() {
 
 	v1 := r.Group("/v1")
 
-	v1.POST("/upload", ginupload.Upload(appCtx))
-
-	v1.POST("/register", ginuser.Register(appCtx))
-	v1.POST("/authenticate", ginuser.Login(appCtx))
-	v1.GET("profile", middleware.RequiredAuth(appCtx), ginuser.Profile(appCtx))
-
-	restaurants := v1.Group("/restaurants", middleware.RequiredAuth(appCtx))
-
-	//1. Create new restaurant
-	restaurants.POST("/", ginrestaurant.CreateRestaurant(appCtx))
-
-	//2. GET By Id
-	restaurants.GET("/:id", func(context *gin.Context) {
-		id, err := strconv.Atoi(context.Param("id"))
-
-		if err != nil {
-			context.JSON(http.StatusBadRequest, gin.H{
-				"error": err,
-			})
-			return
-		}
-
-		var data Restaurant
-
-		if err := db.Where("id = ?", id).First(&data).Error; err != nil {
-			context.JSON(http.StatusBadRequest, gin.H{
-				"error": err,
-			})
-			return
-		}
-
-		context.JSON(http.StatusOK, gin.H{
-			"data": data,
-		})
-	})
-
-	//3. Get list restaurant with paging
-	restaurants.GET("", ginrestaurant.ListRestaurant(appCtx))
-
-	//4. Update
-	restaurants.PATCH("/:id", func(context *gin.Context) {
-		id, err := strconv.Atoi(context.Param("id"))
-
-		if err != nil {
-			context.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		var data RestaurantUpdate
-
-		if err := context.ShouldBind(&data); err != nil {
-			context.JSON(http.StatusBadRequest, gin.H{
-				"error": err,
-			})
-		}
-		if err := db.Where("id = ?", id).Updates(&data).Error; err != nil {
-			context.JSON(http.StatusBadRequest, gin.H{
-				"error": err,
-			})
-			return
-		}
-
-		context.JSON(http.StatusOK, gin.H{
-			"data": data,
-		})
-
-	})
-
-	//5 Delete
-	restaurants.DELETE("/:id", ginrestaurant.DeleteRestaurant(appCtx))
+	setupRoute(appCtx, v1)
+	setupAdminRoute(appCtx, v1)
 
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }

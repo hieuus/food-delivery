@@ -11,13 +11,19 @@ func RoleRequired(appCtx appctx.AppContext, allowRoles ...string) func(c *gin.Co
 	return func(c *gin.Context) {
 		u := c.MustGet(common.CurrentUser).(common.Requester)
 
+		hasFound := false
+
 		for _, item := range allowRoles {
 			if item == u.GetUserRole() {
-				c.Next()
+				hasFound = true
 				break
 			}
 		}
 
-		panic(common.ErrNoPermission(errors.New("invalid role user")))
+		if !hasFound {
+			panic(common.ErrNoPermission(errors.New("invalid role user")))
+		}
+
+		c.Next()
 	}
 }
