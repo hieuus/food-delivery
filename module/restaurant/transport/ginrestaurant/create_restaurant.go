@@ -14,11 +14,15 @@ func CreateRestaurant(appCtx appctx.AppContext) gin.HandlerFunc {
 	return func(context *gin.Context) {
 		db := appCtx.GetMainDBConnection()
 
+		requester := context.MustGet(common.CurrentUser).(common.Requester)
+
 		var data restaurantmodel.RestaurantCreate
 
 		if err := context.ShouldBind(&data); err != nil {
 			panic(err)
 		}
+
+		data.UserId = requester.GetUserId()
 
 		store := restaurantstorage.NewSqlStore(db)
 		biz := restaurantbiz.NewCreateRestaurantBiz(store)

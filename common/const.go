@@ -8,3 +8,9 @@ const (
 const (
 	CurrentUser = "user"
 )
+
+type Requester interface {
+	GetUserId() int
+	GetUserRole() string
+	GetUserEmail() string
+}
