@@ -6,21 +6,20 @@ import (
 	restaurantmodel "github.com/hieuus/food-delivery/module/restaurant/model"
 )
 
-type ListRestaurantStore interface {
-	ListDataWithCondition(
+type ListRestaurantRepo interface {
+	ListRestaurant(
 		context context.Context,
 		filter *restaurantmodel.Filter,
 		paging *common.Paging,
-		moreKeys ...string,
 	) ([]restaurantmodel.Restaurant, error)
 }
 
 type listRestaurantBiz struct {
-	store ListRestaurantStore
+	repo ListRestaurantRepo
 }
 
-func NewListRestaurantBiz(store ListRestaurantStore) *listRestaurantBiz {
-	return &listRestaurantBiz{store: store}
+func NewListRestaurantBiz(repo ListRestaurantRepo) *listRestaurantBiz {
+	return &listRestaurantBiz{repo: repo}
 }
 
 func (biz *listRestaurantBiz) ListRestaurant(
@@ -29,7 +28,7 @@ func (biz *listRestaurantBiz) ListRestaurant(
 	paging *common.Paging,
 ) ([]restaurantmodel.Restaurant, error) {
 
-	result, err := biz.store.ListDataWithCondition(context, filter, paging, "User")
+	result, err := biz.repo.ListRestaurant(context, filter, paging)
 
 	if err != nil {
 		return nil, err
