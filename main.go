@@ -6,6 +6,7 @@ import (
 	"github.com/hieuus/food-delivery/component/uploadprovider"
 	"github.com/hieuus/food-delivery/middleware"
 	"github.com/hieuus/food-delivery/module/restaurant/transport/ginrestaurant"
+	"github.com/hieuus/food-delivery/module/restaurantlike/transport/ginrstlike"
 	"github.com/hieuus/food-delivery/module/upload/uploadtransport/ginupload"
 	"github.com/hieuus/food-delivery/module/user/transport/ginuser"
 	"gorm.io/driver/mysql"
@@ -142,6 +143,12 @@ func setupRoutes(appCtx appctx.AppContext, v1 *gin.RouterGroup) {
 
 	//5 Delete
 	restaurants.DELETE("/:id", ginrestaurant.DeleteRestaurant(appCtx))
+
+	//User like restaurant
+	restaurants.POST("/:id/like", ginrstlike.UserLikeRestaurant(appCtx))
+
+	//User dislike restaurant
+	restaurants.DELETE("/:id/dislike", ginrstlike.UserDislikeRestaurant(appCtx))
 }
 
 func setupAdminRoutes(appCtx appctx.AppContext, v1 *gin.RouterGroup) {
