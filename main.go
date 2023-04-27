@@ -149,6 +149,11 @@ func setupRoutes(appCtx appctx.AppContext, v1 *gin.RouterGroup) {
 
 	//User dislike restaurant
 	restaurants.DELETE("/:id/dislike", ginrstlike.UserDislikeRestaurant(appCtx))
+
+	//Get users liked restaurant: resID
+	//GET v1/restaurants/:id/liked-users
+	restaurants.GET("/:id/liked-users", ginrstlike.ListUsers(appCtx))
+
 }
 
 func setupAdminRoutes(appCtx appctx.AppContext, v1 *gin.RouterGroup) {
