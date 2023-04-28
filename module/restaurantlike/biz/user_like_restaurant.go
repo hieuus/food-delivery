@@ -2,19 +2,26 @@ package restaurantlikebiz
 
 import (
 	"context"
+	"github.com/hieuus/food-delivery/common"
 	restaurantlikemodel "github.com/hieuus/food-delivery/module/restaurantlike/model"
+	"log"
 )
 
 type UserLikeRestaurantStore interface {
 	Create(ctx context.Context, data *restaurantlikemodel.Like) error
 }
 
-type userLikeRestaurantBiz struct {
-	store UserLikeRestaurantStore
+type IncreaseLikedCountRestaurantStore interface {
+	IncreaseLikeCount(ctx context.Context, id int) error
 }
 
-func NewUserLikeRestaurantBiz(store UserLikeRestaurantStore) *userLikeRestaurantBiz {
-	return &userLikeRestaurantBiz{store}
+type userLikeRestaurantBiz struct {
+	store    UserLikeRestaurantStore
+	increase IncreaseLikedCountRestaurantStore
+}
+
+func NewUserLikeRestaurantBiz(store UserLikeRestaurantStore, increase IncreaseLikedCountRestaurantStore) *userLikeRestaurantBiz {
+	return &userLikeRestaurantBiz{store, increase}
 }
 
 func (biz *userLikeRestaurantBiz) LikeRestaurant(ctx context.Context, data *restaurantlikemodel.Like) error {
@@ -23,6 +30,13 @@ func (biz *userLikeRestaurantBiz) LikeRestaurant(ctx context.Context, data *rest
 	if err != nil {
 		return restaurantlikemodel.ErrCannotDislikeRestaurant(err)
 	}
+
+	go func() {
+		defer common.AppRecover()
+		if err := biz.increase.IncreaseLikeCount(ctx, data.RestaurantId); err != nil {
+			log.Println(err)
+		}
+	}()
 
 	return nil
 }

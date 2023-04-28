@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hieuus/food-delivery/common"
 	"github.com/hieuus/food-delivery/component/appctx"
+	restaurantstorage "github.com/hieuus/food-delivery/module/restaurant/storage"
 	restaurantlikebiz "github.com/hieuus/food-delivery/module/restaurantlike/biz"
 	restaurantlikemodel "github.com/hieuus/food-delivery/module/restaurantlike/model"
 	restaurantlikestorage "github.com/hieuus/food-delivery/module/restaurantlike/storage"
@@ -26,7 +27,8 @@ func UserLikeRestaurant(appCtx appctx.AppContext) gin.HandlerFunc {
 		}
 
 		store := restaurantlikestorage.NewSqlStore(appCtx.GetMainDBConnection())
-		biz := restaurantlikebiz.NewUserLikeRestaurantBiz(store)
+		incStore := restaurantstorage.NewSqlStore(appCtx.GetMainDBConnection())
+		biz := restaurantlikebiz.NewUserLikeRestaurantBiz(store, incStore)
 
 		if err := biz.LikeRestaurant(c.Request.Context(), &data); err != nil {
 			panic(err)

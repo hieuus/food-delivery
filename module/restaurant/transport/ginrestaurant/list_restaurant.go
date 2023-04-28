@@ -8,7 +8,6 @@ import (
 	restaurantmodel "github.com/hieuus/food-delivery/module/restaurant/model"
 	restaurantrepo "github.com/hieuus/food-delivery/module/restaurant/repository"
 	restaurantstorage "github.com/hieuus/food-delivery/module/restaurant/storage"
-	restaurantlikestorage "github.com/hieuus/food-delivery/module/restaurantlike/storage"
 	"net/http"
 )
 
@@ -33,8 +32,8 @@ func ListRestaurant(appCtx appctx.AppContext) gin.HandlerFunc {
 		filter.Status = []int{1}
 
 		store := restaurantstorage.NewSqlStore(db)
-		likeStore := restaurantlikestorage.NewSqlStore(db)
-		repo := restaurantrepo.NewListRestaurantRepo(store, likeStore)
+		//likeStore := restaurantlikestorage.NewSqlStore(db)
+		repo := restaurantrepo.NewListRestaurantRepo(store)
 		biz := restaurantbiz.NewListRestaurantBiz(repo)
 
 		result, err := biz.ListRestaurant(context.Request.Context(), &filter, &pagingData)
