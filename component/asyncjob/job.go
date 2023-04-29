@@ -22,6 +22,20 @@ type job struct {
 	stopChan   chan bool
 }
 
+func NewJob(handler JobHandler) *job {
+	j := job{
+		config: jobConfig{
+			MaxTimeout: defaultMaxTimeout,
+			Retries:    defaultRetryTime,
+		},
+		handle:     handler,
+		retryIndex: -1,
+		state:      StateInit,
+		stopChan:   make(chan bool),
+	}
+	return &j
+}
+
 // State
 type JobState int
 

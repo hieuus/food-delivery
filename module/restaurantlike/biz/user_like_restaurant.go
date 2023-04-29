@@ -2,7 +2,7 @@ package restaurantlikebiz
 
 import (
 	"context"
-	"github.com/hieuus/food-delivery/common"
+	"github.com/hieuus/food-delivery/component/asyncjob"
 	restaurantlikemodel "github.com/hieuus/food-delivery/module/restaurantlike/model"
 	"log"
 )
@@ -31,12 +31,14 @@ func (biz *userLikeRestaurantBiz) LikeRestaurant(ctx context.Context, data *rest
 		return restaurantlikemodel.ErrCannotDislikeRestaurant(err)
 	}
 
-	go func() {
-		defer common.AppRecover()
-		if err := biz.increase.IncreaseLikeCount(ctx, data.RestaurantId); err != nil {
-			log.Println(err)
-		}
-	}()
+	//Side Effect
+	j := asyncjob.NewJob(func(ctx context.Context) error {
+		return biz.increase.IncreaseLikeCount(ctx, data.RestaurantId)
+	})
+
+	if err := asyncjob.NewGroup(true, *j).Run(ctx); err != nil {
+		log.Println(err)
+	}
 
 	return nil
 }
