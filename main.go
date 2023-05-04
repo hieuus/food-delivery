@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/hieuus/food-delivery/component/appctx"
 	"github.com/hieuus/food-delivery/component/uploadprovider"
@@ -9,6 +10,8 @@ import (
 	"github.com/hieuus/food-delivery/module/restaurantlike/transport/ginrstlike"
 	"github.com/hieuus/food-delivery/module/upload/uploadtransport/ginupload"
 	"github.com/hieuus/food-delivery/module/user/transport/ginuser"
+	"github.com/hieuus/food-delivery/pubsub/localpubsub"
+	"github.com/hieuus/food-delivery/subscriber"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
@@ -55,8 +58,11 @@ func main() {
 	db = db.Debug()
 
 	s3Provider := uploadprovider.NewS3Provider(s3BucketName, s3Region, s3APIKey, s3SecretKey, s3Domain)
+	ps := localpubsub.NewPubsub()
+	appCtx := appctx.NewAppContext(db, s3Provider, secretKey, ps)
 
-	appCtx := appctx.NewAppContext(db, s3Provider, secretKey)
+	//Setup subscriber
+	subscriber.Setup(appCtx, context.Background())
 
 	//REST API
 	r := gin.Default()

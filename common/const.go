@@ -11,6 +11,8 @@ const (
 	CurrentUser = "user"
 )
 
+const TopicUserLikeRestaurant = "UserLikeRestaurant"
+
 type Requester interface {
 	GetUserId() int
 	GetUserRole() string
