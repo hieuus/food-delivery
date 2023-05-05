@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hieuus/food-delivery/common"
 	"github.com/hieuus/food-delivery/component/appctx"
-	restaurantstorage "github.com/hieuus/food-delivery/module/restaurant/storage"
 	restaurantlikebiz "github.com/hieuus/food-delivery/module/restaurantlike/biz"
 	restaurantlikestorage "github.com/hieuus/food-delivery/module/restaurantlike/storage"
 	"net/http"
@@ -21,8 +20,8 @@ func UserDislikeRestaurant(appCtx appctx.AppContext) gin.HandlerFunc {
 		requester := c.MustGet(common.CurrentUser).(common.Requester)
 
 		store := restaurantlikestorage.NewSqlStore(appCtx.GetMainDBConnection())
-		decreaseStore := restaurantstorage.NewSqlStore(appCtx.GetMainDBConnection())
-		biz := restaurantlikebiz.NewUserDislikeRestaurantBiz(store, decreaseStore)
+		//decreaseStore := restaurantstorage.NewSqlStore(appCtx.GetMainDBConnection())
+		biz := restaurantlikebiz.NewUserDislikeRestaurantBiz(store, appCtx.GetPubsub())
 
 		if err := biz.DislikeRestaurant(c.Request.Context(), requester.GetUserId(), int(uid.GetLocalID())); err != nil {
 			panic(err)
