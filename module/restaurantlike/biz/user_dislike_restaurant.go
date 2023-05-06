@@ -36,9 +36,14 @@ func (biz *userDislikeRestaurantBiz) DislikeRestaurant(ctx context.Context, user
 		return restaurantlikemodel.ErrCannotLikeRestaurant(err)
 	}
 
+	data := &restaurantlikemodel.Like{
+		RestaurantId: restaurantId,
+		UserId:       userId,
+	}
+
 	//Send message
 	if err := biz.ps.Publish(ctx, common.TopicUserDislikeRestaurant,
-		pubsub.NewMessage(restaurantlikemodel.Like{RestaurantId: restaurantId})); err != nil {
+		pubsub.NewMessage(data)); err != nil {
 		log.Println(err)
 	}
 

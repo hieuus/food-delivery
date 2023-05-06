@@ -8,7 +8,7 @@ import (
 )
 
 func DecreaseLikeCountAfterUserDislikeRestaurant(appCtx appctx.AppContext, ctx context.Context) {
-	c, _ := appCtx.GetPubsub().Subcribe(ctx, common.TopicUserLikeRestaurant)
+	c, _ := appCtx.GetPubsub().Subcribe(ctx, common.TopicUserDislikeRestaurant)
 
 	store := restaurantstorage.NewSqlStore(appCtx.GetMainDBConnection())
 
