@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/hieuus/food-delivery/component/appctx"
 	"github.com/hieuus/food-delivery/component/uploadprovider"
@@ -62,7 +61,10 @@ func main() {
 	appCtx := appctx.NewAppContext(db, s3Provider, secretKey, ps)
 
 	//Setup subscriber
-	subscriber.Setup(appCtx, context.Background())
+	//subscriber.Setup(appCtx, context.Background())
+
+	//Start Engine Subscriber
+	subscriber.NewEngine(appCtx).Start()
 
 	//REST API
 	r := gin.Default()

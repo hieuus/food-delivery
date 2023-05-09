@@ -9,11 +9,11 @@ import (
 
 type group struct {
 	isConcurrent bool
-	jobs         []job
+	jobs         []Job
 	wg           *sync.WaitGroup
 }
 
-func NewGroup(isConcurrent bool, jobs ...job) *group {
+func NewGroup(isConcurrent bool, jobs ...Job) *group {
 	g := &group{
 		isConcurrent: isConcurrent,
 		jobs:         jobs,
@@ -32,7 +32,7 @@ func (g *group) Run(ctx context.Context) error {
 
 		if g.isConcurrent {
 
-			go func(aj job) {
+			go func(aj Job) {
 				defer common.AppRecover()
 				errChan <- g.runJob(ctx, aj)
 				g.wg.Done()
@@ -59,7 +59,7 @@ func (g *group) Run(ctx context.Context) error {
 	return err
 }
 
-func (g *group) runJob(ctx context.Context, j job) error {
+func (g *group) runJob(ctx context.Context, j Job) error {
 	if err := j.Execute(ctx); err != nil {
 		for {
 			log.Println(err)
