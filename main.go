@@ -10,6 +10,7 @@ import (
 	"github.com/hieuus/food-delivery/module/upload/uploadtransport/ginupload"
 	"github.com/hieuus/food-delivery/module/user/transport/ginuser"
 	"github.com/hieuus/food-delivery/pubsub/localpubsub"
+	"github.com/hieuus/food-delivery/skio"
 	"github.com/hieuus/food-delivery/subscriber"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -74,6 +75,9 @@ func main() {
 
 	setupRoutes(appCtx, v1)
 	setupAdminRoutes(appCtx, v1)
+
+	//SocketIO
+	skio.NewEngine().Run(appCtx, r)
 
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
